@@ -39,20 +39,13 @@ router.get("/GetPokemons" , (req,res) => {
    })
 })
 
-router.get('/pokemon/:id', (req, res) => {
-    if(!isSufficientParameter(req.params.id)){
-        res.status(400).send({error:'Insufficient parameter: pokemon are required parameter'}) //https status 4xx up such as 4xx client error 
-        return
-    }
-
-    let id = req.params.id-1
-    let p = pokemon.getPokemonById(id)
-    if(!pokemon.isPokemonExisted(id)){
-        res.status(400).send({error:'The pokemon could not be found'}) //https status 4xx up such as 4xx client error 
-        return
-    }
-
-    res.send(p)
+router.get('/pokemons/:id', (req, res) => {
+    pokemon.getPokemonById(req.params.id).then((result) => {
+        res.send(result)
+   }).catch((err)=> {
+       console.error(err)
+       res.status(400).send({error:'Pokemon not found'}) 
+   })
 })
 
 router.put('/pokemon/:id', (req, res) => {

@@ -1,6 +1,9 @@
 const MongoClient = require('mongodb').MongoClient
 const ObjectID = require('mongodb').ObjectID
-
+const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority' //URL
+const DB_NAME = 'example'
+const option = {useNewUrlParser: true , useUnifiedTopology : true}
+var client
 class Pokemon{
     constructor(name,type){
         this.id=null
@@ -11,19 +14,34 @@ class Pokemon{
 }
 
 let pokemons = []
-mockPokemon()
+
+async function GetConnection(){
+    if(client !== undefined && client.isConnect && client !== null){
+        return client
+    }
+    else
+    {
+        var client = await MongoClient.connect(DB_URL , option)
+        
+        .catch( err => console.error(err))
+        return client
+    }
+}
+
+
+async function GetCollection(name){
+    client = await GetConnection().catch(err => console.log(err))
+    database = client.db(DB_NAME)
+    collection = database.collection(name)
+    return collection
+}
 
 async function savePokemon(name,type){
     let p = createPokemon(name,type)
-    const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority' //URL
-    const DB_NAME = 'example'
-    const option = {useNewUrlParser: true , useUnifiedTopology : true}
     var collection , database
-    var client = await MongoClient.connect(DB_URL , option)
-        
-        .catch( err => console.error(err))
-        database =  client.db(DB_NAME)
-        collection = database.collection('pokemon')
+    var client = await GetConnection()
+        database = client.db(DB_NAME)
+        collection = await GetCollection('pokemon')
         try {
             var result = await collection.insert(p)
             return true
@@ -35,15 +53,8 @@ async function savePokemon(name,type){
 }
 
 async function GetPokemons(){
-    const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority' //URL
-    const DB_NAME = 'example'
-    const option = {useNewUrlParser: true , useUnifiedTopology : true}
     var collection , database
-    var client = await MongoClient.connect(DB_URL , option)
-        
-        .catch( err => console.error(err))
-        database =  client.db(DB_NAME)
-        collection = database.collection('pokemon')
+        collection = await GetCollection('pokemon')
         try {
             var result = await collection.find({}).toArray()
             return result
@@ -55,10 +66,6 @@ async function GetPokemons(){
 
 }
 
-function mockPokemon(){
-    pokemons.push(createPokemon('Pikachu','Electhic'))
-    pokemons.push(createPokemon('Goduk','Water'))
-}
 
 function createId(num){
     return num + 1
@@ -74,8 +81,16 @@ function isPokemonExisted(id){
     return pokemons[id] !== undefined && pokemons[id] !== null
 }
 
-function getPokemonById(id){
-    return pokemons[id]
+async function getPokemonById(id){
+        collection = await GetCollection('pokemon')
+        try {
+            var result = await collection.find({"_id" : ObjectID(id)}).toArray()
+            return result
+        } catch(err){
+            return false
+        } finally {
+            client.close()
+        }        
 }
 
 function updatePokemon(pokemon){
