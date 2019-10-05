@@ -14,15 +14,29 @@ router.post("/pokemons", (req, res) => {
         res.status(400).send({error:'Insufficient parameter: name and type are required parameter'}) //https status 4xx up such as 4xx client error 
         return 
     }
-    let success = pokemon.savePokemon(req.body.name,req.body.type)
-    if(!success){
-        res.status(400).send({error:'Create pokemon is unsuccessfully'}) //https status 4xx up such as 4xx client error 
-        return 
-    }
+    pokemon.savePokemon(req.body.name,req.body.type).then((result) => {
+         res.sendStatus(201)
+    }).catch((err)=> {
+        console.error(err)
+        res.status(400).send({error:'Create pokemon is unsuccessfully'}) 
+    })
+ //   if(!success){
+  //      res.status(400).send({error:'Create pokemon is unsuccessfully'}) //https status 4xx up such as 4xx client error 
+ //       return 
+  //  }
 
     // let pokemon = createPokemon(req.body.name,req.body.type)
     // pokemons.push(pokemon)
-    res.sendStatus(201)
+ //   res.sendStatus(201)
+})
+
+router.get("/GetPokemons" , (req,res) => {
+    pokemon.GetPokemons().then((result) => {
+        res.send(result)
+   }).catch((err)=> {
+       console.error(err)
+       res.status(400).send({error:'Error'}) 
+   })
 })
 
 router.get('/pokemon/:id', (req, res) => {

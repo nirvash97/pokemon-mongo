@@ -13,25 +13,46 @@ class Pokemon{
 let pokemons = []
 mockPokemon()
 
-function savePokemon(name,type){
+async function savePokemon(name,type){
     let p = createPokemon(name,type)
-    const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority'
+    const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority' //URL
     const DB_NAME = 'example'
+    const option = {useNewUrlParser: true , useUnifiedTopology : true}
     var collection , database
-    MongoClient.connect(DB_URL,{useNewUrlParser: true , useUnifiedTopology : true} , (err,client) => {
-        if(err){
-            return false
-        }
+    var client = await MongoClient.connect(DB_URL , option)
+        
+        .catch( err => console.error(err))
         database =  client.db(DB_NAME)
         collection = database.collection('pokemon')
-        collection.insert(p ,(err,result) => {
-            if(err)
-            {
-                return false
-            }
+        try {
+            var result = await collection.insert(p)
             return true
-        }) 
-    })
+        } catch(err){
+            return false
+        } finally {
+            client.close()
+        }        
+}
+
+async function GetPokemons(){
+    const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority' //URL
+    const DB_NAME = 'example'
+    const option = {useNewUrlParser: true , useUnifiedTopology : true}
+    var collection , database
+    var client = await MongoClient.connect(DB_URL , option)
+        
+        .catch( err => console.error(err))
+        database =  client.db(DB_NAME)
+        collection = database.collection('pokemon')
+        try {
+            var result = await collection.find({}).toArray()
+            return result
+        } catch(err){
+            return false
+        } finally {
+            client.close()
+        }        
+
 }
 
 function mockPokemon(){
@@ -77,3 +98,4 @@ module.exports.getPokemonById = getPokemonById
 module.exports.updatePokemon = updatePokemon
 
 module.exports.deletePokemon = deletePokemon
+module.exports.GetPokemons= GetPokemons
