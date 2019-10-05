@@ -48,7 +48,7 @@ router.get('/pokemons/:id', (req, res) => {
    })
 })
 
-router.put('/pokemon/:id', (req, res) => {
+router.put('/pokemons/:id', (req, res) => {
     if(!isSufficientParameter(req.body.type2)){
         res.status(400).send({error:'Insufficient parameter: type2 are required parameter'}) //https status 4xx up such as 4xx client error 
         return
@@ -59,21 +59,20 @@ router.put('/pokemon/:id', (req, res) => {
         return
     }
 
-    let id = req.params.id-1
+    let id = req.params.id
 
-    if(!pokemon.isPokemonExisted(id)){
-        res.status(400).send({error:'Cannot update Pokemon: Pokemon is not found'}) //https status 4xx up such as 4xx client error 
-        return
-    }
-    let p = pokemon.getPokemonById(id)
-    p.type2 = req.body.type2
-    let success = pokemon.updatePokemon(p)
-    if(!success){
-        res.status(400).send({error:'Update pokemon is unsuccessfully'}) //https status 4xx up such as 4xx client error 
-        return 
-    }
-
-    res.sendStatus(200) //update use 200 or **204 ในกรณีที่่ไม่มี respon body เท่านั้น
+    // if(!pokemon.isPokemonExisted(id)){
+    //     res.status(400).send({error:'Cannot update Pokemon: Pokemon is not found'}) //https status 4xx up such as 4xx client error 
+    //     return
+    // }
+    // let p = pokemon.getPokemonById(id)
+    // p.type2 = req.body.type2
+    pokemon.updatePokemon(id,req.body.type2).then((result) => {
+        res.sendStatus(200)
+   }).catch((err)=> {
+       console.error(err)
+       res.status(400).send({error:'Pokemon not found'}) 
+   })
 })
 
 router.delete('/pokemon/:id', (req, res) => {

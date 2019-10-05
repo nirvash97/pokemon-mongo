@@ -37,9 +37,7 @@ async function GetCollection(name){
 }
 
 async function savePokemon(name,type){
-    let p = createPokemon(name,type)
-    var collection , database
-    var client = await GetConnection()
+    var client = await GetConnection('pokemon')
         database = client.db(DB_NAME)
         collection = await GetCollection('pokemon')
         try {
@@ -93,9 +91,16 @@ async function getPokemonById(id){
         }        
 }
 
-function updatePokemon(pokemon){
-    pokemons[pokemon.id] = pokemon
-    return true
+async function updatePokemon(id,type2){
+        collection = await GetCollection('pokemon')
+        try {
+            var result = await collection.update({"_id" : ObjectID(id)} , {$set : {"type2" : type2}})
+            return true
+        } catch(err){
+            return false
+        } finally {
+            client.close()
+        }        
 }
 
 function deletePokemon(id){
