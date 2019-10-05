@@ -95,7 +95,7 @@ async function updatePokemon(id,type2){
         collection = await GetCollection('pokemon')
         try {
             var result = await collection.update({"_id" : ObjectID(id)} , {$set : {"type2" : type2}})
-            return true
+            return result
         } catch(err){
             return false
         } finally {

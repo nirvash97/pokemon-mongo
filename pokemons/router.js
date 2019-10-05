@@ -48,7 +48,7 @@ router.get('/pokemons/:id', (req, res) => {
    })
 })
 
-router.put('/pokemons/:id', (req, res) => {
+router.put('/pokemons/:id', async (req, res) => {
     if(!isSufficientParameter(req.body.type2)){
         res.status(400).send({error:'Insufficient parameter: type2 are required parameter'}) //https status 4xx up such as 4xx client error 
         return
