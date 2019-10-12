@@ -1,6 +1,6 @@
 const MongoClient = require('mongodb').MongoClient
 const ObjectID = require('mongodb').ObjectID
-const DB_URL = 'mongodb+srv://59160273:Chariot97@pokemon-cluster-otxxa.gcp.mongodb.net/test?retryWrites=true&w=majority' //URL
+let DB_URL = 'mongodb+srv://59160273:Chariot97@pokemon-cluster-otxxa.gcp.mongodb.net/test?retryWrites=true&w=majority' //URL
 const DB_NAME = 'Pokemondb'
 const option = {useNewUrlParser: true , useUnifiedTopology : true}
 var client
@@ -37,11 +37,12 @@ async function GetCollection(name){
 }
 
 async function savePokemon(name,type){
+    let p = await createPokemon(name,type)
     var client = await GetConnection('pokemons')
         database = client.db(DB_NAME)
         collection = await GetCollection('pokemons')
         try {
-            var result = await collection.insert(p)
+            var result = await collection.insertOne(p)
             return true
         } catch(err){
             return false
@@ -107,15 +108,16 @@ function deletePokemon(id){
     delete pokemons[id]
 }
 
+function setDBUri(uri){
+    DB_URL = uri
+}
+
 module.exports.isPokemonExisted = isPokemonExisted
-
 module.exports.createPokemon = createPokemon
-
 module.exports.savePokemon = savePokemon
-
 module.exports.getPokemonById = getPokemonById
-
 module.exports.updatePokemon = updatePokemon
-
 module.exports.deletePokemon = deletePokemon
 module.exports.GetPokemons= GetPokemons
+module.exports.dburi = setDBUri
+module.exports.GetConnection = GetConnection
