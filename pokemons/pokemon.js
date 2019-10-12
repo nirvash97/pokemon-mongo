@@ -1,7 +1,7 @@
 const MongoClient = require('mongodb').MongoClient
 const ObjectID = require('mongodb').ObjectID
-const DB_URL = 'mongodb+srv://59160273:Chariot97@cluster0-otxxa.gcp.mongodb.net/admin?retryWrites=true&w=majority' //URL
-const DB_NAME = 'example'
+const DB_URL = 'mongodb+srv://59160273:Chariot97@pokemon-cluster-otxxa.gcp.mongodb.net/test?retryWrites=true&w=majority' //URL
+const DB_NAME = 'Pokemondb'
 const option = {useNewUrlParser: true , useUnifiedTopology : true}
 var client
 class Pokemon{
@@ -37,9 +37,9 @@ async function GetCollection(name){
 }
 
 async function savePokemon(name,type){
-    var client = await GetConnection('pokemon')
+    var client = await GetConnection('pokemons')
         database = client.db(DB_NAME)
-        collection = await GetCollection('pokemon')
+        collection = await GetCollection('pokemons')
         try {
             var result = await collection.insert(p)
             return true
@@ -52,7 +52,7 @@ async function savePokemon(name,type){
 
 async function GetPokemons(){
     var collection , database
-        collection = await GetCollection('pokemon')
+        collection = await GetCollection('pokemons')
         try {
             var result = await collection.find({}).toArray()
             return result
@@ -80,7 +80,7 @@ function isPokemonExisted(id){
 }
 
 async function getPokemonById(id){
-        collection = await GetCollection('pokemon')
+        collection = await GetCollection('pokemons')
         try {
             var result = await collection.find({"_id" : ObjectID(id)}).toArray()
             return result
@@ -92,7 +92,7 @@ async function getPokemonById(id){
 }
 
 async function updatePokemon(id,type2){
-        collection = await GetCollection('pokemon')
+        collection = await GetCollection('pokemons')
         try {
             var result = await collection.update({"_id" : ObjectID(id)} , {$set : {"type2" : type2}})
             return result
